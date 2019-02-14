@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+    prometheus_io_scrape: "true"
+    prometheus_io_port: "20120"
+    scheduler.alpha.kubernetes.io/critical-pod: ''
+  labels:
+    app: ioguarder 
+  name: ioguarder
+  namespace: ioguarder
+spec:
+  selector:
+    matchLabels:
+      app: ioguarder
+  template:
+    metadata:
+      labels:
+        app: ioguarder
+    spec:
+      automountServiceAccountToken: false
+      hostNetwork: true
+      containers:
+      - image: harbor.meitu-int.com/google_containers/io-guarder:v0.0.7
+        name: io-guarder
+        command: ["/bin/sh"]
+        args: ["-c", "/io-guarder -v 10 --healthz-address=0.0.0.0:20120 --runtime-endpoint  unix:///var-run/docker.sock"]
+        env:
+          - name: GIN_MODE
+            value: debug
+        ports:
+        - containerPort: 20120
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 150m
+          limits:
+            memory: 1G
+            cpu: 1
+        livenessProbe:
+          httpGet:
+            host: 127.0.0.1
+            path: /devops/status
+            port: 20120
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var-run
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: false
+        - name: docker
+          mountPath: /var/lib/docker
+          readOnly: true
+        - name: disk
+          mountPath: /dev/disk
+          readOnly: true
+        - name: localtime
+          mountPath: /etc/localtime
+          readOnly: true
+        - name: www
+          mountPath: /www
+          readOnly: false
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
+      - name: disk
+        hostPath:
+          path: /dev/disk
+      - name: localtime
+        hostPath:
+          path: /usr/share/zoneinfo/Asia/Shanghai
+      - name: www
+        hostPath:
+          path: /www
