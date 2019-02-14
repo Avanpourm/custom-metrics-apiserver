@@ -103,8 +103,8 @@ func (o *CustomMetricsServerOptions) AddFlags(flags *pflag.FlagSet) {
 	flags.MarkDeprecated("deprecated-kubelet-completely-insecure", "This is rarely the right option, since it leaves kubelet communication completely insecure.  If you encounter auth errors, make sure you've enabled token webhook auth on the Kubelet, and if you're in a test cluster with self-signed Kubelet certificates, consider using kubelet-insecure-tls instead.")
 	flags.IntVar(&o.NginxStatsPort, "nginx-stats-port", o.NginxStatsPort, "The port to use to connect to nginx stats.")
 	flags.StringVar(&o.NginxStatsPath, "nginx-stats-path", o.NginxStatsPath, "The path to use to connect to nginx stats.")
-	flags.StringVar(&o.NginxNodeLabel, "nginx-node-label", o.NginxStatsPath, "The label to use to list the nginx stats nodes.")
-	flags.StringVar(&o.NginxNodeSelectorKey, "nginx-node-selector-key", o.NginxStatsPath, "The selector key of the nginx stats nodes.")
+	flags.StringVar(&o.NginxNodeLabel, "nginx-node-label", o.NginxNodeLabel, "The label to use to list the nginx stats nodes.")
+	flags.StringVar(&o.NginxNodeSelectorKey, "nginx-node-selector-key", o.NginxNodeSelectorKey, "The selector key of the nginx stats nodes.")
 
 }
 
